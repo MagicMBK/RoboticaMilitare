@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Robotica nel Campo Militare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --military-blue: rgb(14, 42, 71);
+            --accent-orange: rgb(217, 83, 79);
+            --light-gray-bg: rgb(245, 245, 245);
+            --tech-green: rgb(40, 167, 69);
+            --alert-red: rgb(220, 53, 69);
+            --dark-bg: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #fff;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--military-blue) 0%, #2c5f8d 50%, #1a5490 100%);
+            color: white;
+            padding: 8rem 2rem 6rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path fill="rgba(255,255,255,0.05)" d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"></path></svg>') repeat-x;
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease-out 0.3s backwards;
+        }
+
+        .hero-icon {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .project-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 15px;
+            padding: 2rem 3rem;
+            margin-top: 2rem;
+            animation: fadeIn 1s ease-out 0.6s backwards;
+        }
+
+        .project-badge strong {
+            color: #fff;
+            font-size: 1.2rem;
+        }
+
+        .deadline {
+            color: var(--accent-orange);
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--military-blue);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 1.2rem 1.8rem;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--accent-orange);
+            transition: all 0.3s;
+            transform: translateX(-50%);
+        }
+
+        nav a:hover::after,
+        nav a.active::after {
+            width: 80%;
+        }
+
+        nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Section Styling */
+        section {
+            padding: 5rem 2rem;
+            scroll-margin-top: 60px;
+        }
+
+        .section-alt {
+            background: var(--light-gray-bg);
+        }
+
+        .section-dark {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+        }
+
+        /* Fix per testo bianco su sfondo bianco nelle sezioni dark */
+        .section-dark > .container > .section-header h2 {
+            color: white;
+        }
+
+        .section-dark > .container > .section-header p {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .section-header h2 {
+            color: var(--military-blue);
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent-orange);
+            border-radius: 2px;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 700px;
+            margin: 1.5rem auto 0;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            color: var(--military-blue);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .card h3 i {
+            color: var(--accent-orange);
+            font-size: 2rem;
+        }
+
+        .card h4 {
+            color: var(--military-blue);
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .card p {
+            color: #333;
+        }
+
+        .card ul {
+            color: #333;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-box::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+        }
+
+        .info-box-definition {
+            background: linear-gradient(135deg, rgba(14, 42, 71, 0.05) 0%, rgba(14, 42, 71, 0.1) 100%);
+            border: 2px solid var(--military-blue);
+        }
+
+        .info-box-definition::before {
+            background: var(--military-blue);
+        }
+
+        .info-box-key {
+            background: linear-gradient(135deg, rgba(217, 83, 79, 0.05) 0%, rgba(217, 83, 79, 0.1) 100%);
+            border: 2px solid var(--accent-orange);
+        }
+
+        .info-box-key::before {
+            background: var(--accent-orange);
+        }
+
+        .info-box-note {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.05) 0%, rgba(255, 193, 7, 0.15) 100%);
+            border: 2px solid #ffc107;
+        }
+
+        .info-box-note::before {
+            background: #ffc107;
+        }
+
+        .info-box h4 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .info-box-definition h4 {
+            color: var(--military-blue);
+        }
+
+        .info-box-key h4 {
+            color: var(--accent-orange);
+        }
+
+        .info-box-note h4 {
+            color: #d68910;
+        }
+
+        .info-box p,
+        .info-box ul,
+        .info-box li {
+            color: #333;
+        }
+
+        /* Team Section */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border-top: 4px solid var(--military-blue);
+        }
+
+        .team-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+            border-top-color: var(--accent-orange);
+        }
+
+        .team-card-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--military-blue), var(--accent-orange));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .team-card h4 {
+            color: var(--military-blue);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-card p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Pros & Cons Section */
+        .pros-cons-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        .pros-box, .cons-box {
+            border-radius: 15px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pros-box {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+            border: 3px solid var(--tech-green);
+        }
+
+        .cons-box {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+            border: 3px solid var(--alert-red);
+        }
+
+        .pros-box h3, .cons-box h3 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pros-box h3 {
+            color: var(--tech-green);
+        }
+
+        .cons-box h3 {
+            color: var(--alert-red);
+        }
+
+        .pros-box h3 i, .cons-box h3 i {
+            font-size: 2.5rem;
+        }
+
+        .pros-box ul,
+        .cons-box ul {
+            color: #333;
+        }
+
+        .pros-box ul li, .cons-box ul li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            color: #333;
+        }
+
+        .pros-box ul li:last-child, .cons-box ul li:last-child {
+            border-bottom: none;
+        }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--military-blue) 0%, #1a5490 100%);
+        }
+
+        th {
+            color: white;
+            padding: 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        td {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        tbody tr {
+            transition: background 0.3s;
+        }
+
+        tbody tr:hover {
+            background: rgba(14, 42, 71, 0.05);
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--light-gray-bg);
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: rgba(14, 42, 71, 0.08);
+        }
+
+        /* Lists */
+        .styled-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .styled-list li {
+            padding: 1rem 0 1rem 2.5rem;
+            position: relative;
+            color: #333;
+        }
+
+        .styled-list li::before {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: var(--accent-orange);
+            font-size: 1.2rem;
+        }
+
+        /* Glossary */
+        .glossary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .glossary-item {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--accent-orange);
+            transition: all 0.3s;
+        }
+
+        .glossary-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.12);
+        }
+
+        .glossary-item dt {
+            font-weight: bold;
+            color: var(--military-blue);
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .glossary-item dd {
+            color: #555;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--military-blue) 0%, #1a5490 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            margin-top: 4rem;
+        }
+
+        footer .footer-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        footer h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        footer p {
+            opacity: 0.9;
+            margin: 0.5rem 0;
+            color: white;
+        }
+
+        .footer-team {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .hero-icon {
+                font-size: 3rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .pros-cons-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            section {
+                padding: 3rem 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Content Typography */
+        .content-block p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.9;
+            color: #333;
+        }
+
+        .content-block ul, .content-block ol {
+            margin: 1.5rem 0;
+        }
+
+        .content-block li {
+            margin: 1rem 0;
+            font-size: 1.05rem;
+            color: #333;
+        }
+
+        strong {
+            color: var(--military-blue);
+            font-weight: 600;
+        }
+
+        .highlight-text {
+            background: linear-gradient(120deg, rgba(217, 83, 79, 0.2) 0%, rgba(217, 83, 79, 0.2) 100%);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Icon Blocks */
+        .icon-block {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .icon-block-icon {
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--military-blue), var(--accent-orange));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        .icon-block-content h4 {
+            color: var(--military-blue);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .icon-block-content p {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <div class="hero-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h1>LA ROBOTICA NEL CAMPO MILITARE</h1>
+            <p class="subtitle">Robotica e Futuro dell'Automazione</p>
+            <div class="project-badge">
+                <strong>Progetto Finale di Tecnologia</strong><br>
+                <em>Esplorazione di uno degli aspetti principali della robotica</em><br><br>
+                <strong>Data di consegna:</strong> <span class="deadline">28 novembre 2025</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="#gruppo"><i class="fas fa-users"></i> Gruppo</a></li>
+            <li><a href="#introduzione"><i class="fas fa-book-open"></i> Introduzione</a></li>
+            <li><a href="#tecnologie"><i class="fas fa-microchip"></i> Tecnologie</a></li>
+            <li><a href="#applicazioni"><i class="fas fa-cogs"></i> Applicazioni</a></li>
+            <li><a href="#evoluzione"><i class="fas fa-chart-line"></i> Evoluzione</a></li>
+            <li><a href="#pro-contro"><i class="fas fa-balance-scale"></i> Pro e Contro</a></li>
+            <li><a href="#conclusioni"><i class="fas fa-flag-checkered"></i> Conclusioni</a></li>
+            <li><a href="#glossario"><i class="fas fa-book"></i> Glossario</a></li>
+        </ul>
+    </nav>
+
+    <!-- Team Section -->
+    <section id="gruppo">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Gruppo di Lavoro</h2>
+                <p>Gli autori che hanno realizzato questo progetto</p>
+            </div>
+
+            <div class="team-grid reveal">
+                <div class="team-card">
+                    <div class="team-card-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4>Federico Nardullo</h4>
+                    <p>Ricerca generale<br>Capitoli 1–2</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-card-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h4>Luca Cremaschi</h4>
+                    <p>Approfondimenti tecnici<br>Capitoli 2–3</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-card-icon">
+                        <i class="fas fa-user-astronaut"></i>
+                    </div>
+                    <h4>Niccolò Decano</h4>
+                    <p>Pro e contro<br>Capitoli 4–5</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-card-icon">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
+                    <h4>Diego Ripamonti</h4>
+                    <p>Revisione e impaginazione<br>Conclusioni</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Introduction Section -->
+    <section id="introduzione" class="section-alt">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Introduzione</h2>
+                <p>Fondamenti della robotica e applicazioni nel settore militare</p>
+            </div>
+
+            <div class="card reveal">
+                <h3><i class="fas fa-robot"></i> Che cos'è la robotica</h3>
+                <div class="content-block">
+                    <div class="info-box info-box-definition">
+                        <h4><i class="fas fa-book"></i> Definizione di robotica</h4>
+                        <p>La robotica è la disciplina dell'ingegneria che studia e sviluppa metodi che permettano a un robot di eseguire dei compiti specifici riproducendo in modo automatico il lavoro umano.</p>
+                    </div>
+
+                    <p>In termini generali, un <strong>robot</strong> è una macchina programmabile capace di:</p>
+                    <ul class="styled-list">
+                        <li>percepire l'ambiente circostante tramite <strong>sensori</strong></li>
+                        <li>elaborare le informazioni grazie a un'unità di <strong>controllo</strong> o calcolo</li>
+                        <li>compiere azioni fisiche tramite <strong>attuatori</strong> (motori, bracci meccanici, sistemi idraulici, ecc.)</li>
+                    </ul>
+
+                    <p>Questi tre elementi -- sensori, controllo, attuatori -- formano l'architettura di base della maggior parte dei sistemi robotici, civili o militari.</p>
+                </div>
+            </div>
+
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <h3><i class="fas fa-shield-alt"></i> Contesto militare</h3>
+                    <div class="content-block">
+                        <p>La robotica è oggi presente in quasi tutti i settori. Uno degli ambiti in cui si è sviluppata più rapidamente è il <strong>settore militare</strong>, dove i robot vengono utilizzati per:</p>
+                        <ul class="styled-list">
+                            <li><strong>ricognizione e sorveglianza</strong> di aree pericolose</li>
+                            <li><strong>supporto logistico</strong> (trasporto materiali, rifornimenti)</li>
+                            <li><strong>neutralizzazione di ordigni esplosivi</strong> e mine</li>
+                            <li><strong>difesa aerea e navale</strong></li>
+                            <li>in alcuni casi, come <strong>sistemi d'arma</strong> veri e propri</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-rocket"></i> Innovazioni recenti</h3>
+                    <div class="content-block">
+                        <p>Negli ultimi vent'anni la robotica militare è stata trasformata da:</p>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-drone"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Sistemi senza equipaggio</h4>
+                                <p>Droni aerei, terrestri e navali</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-brain"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Intelligenza artificiale</h4>
+                                <p>Riconoscimento immagini e pianificazione autonoma</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-wifi"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Reti di comunicazione</h4>
+                                <p>Controllo remoto a grande distanza</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box info-box-key reveal">
+                <h4><i class="fas fa-lightbulb"></i> Linee guida del progetto scolastico</h4>
+                <p>Questo elaborato segue le indicazioni assegnate:</p>
+                <ul class="styled-list">
+                    <li>analisi degli <strong>aspetti principali della robotica</strong> (tecnologie, applicazioni, evoluzione)</li>
+                    <li>approfondimento specifico sulla <strong>robotica nel campo militare</strong></li>
+                    <li>valutazione dei <strong>vantaggi e svantaggi</strong>, con attenzione a questioni etiche e legali</li>
+                    <li>preparazione di un materiale chiaro, strutturato come un <strong>libro di testo</strong></li>
+                </ul>
+            </div>
+
+            <div class="info-box info-box-note reveal">
+                <h4><i class="fas fa-info-circle"></i> Perché studiare la robotica militare?</h4>
+                <p>Capire la robotica nel campo militare significa non solo conoscere sensori e algoritmi, ma riflettere sul rapporto tra tecnologia, politica e responsabilità umana nelle decisioni che riguardano la vita e la morte.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technologies Section -->
+    <section id="tecnologie">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Tecnologie e Componenti</h2>
+                <p>I sistemi che rendono possibile la robotica militare</p>
+            </div>
+
+            <div class="card reveal">
+                <h3><i class="fas fa-microchip"></i> Struttura di base</h3>
+                <div class="content-block">
+                    <p>Indipendentemente dal dominio operativo (terra, aria, mare), un sistema robotico militare comprende:</p>
+                    <div class="grid-3">
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-cube"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Piattaforma meccanica</h4>
+                                <p>Carrello cingolato, drone ad ala fissa, scafo navale, esoscheletro</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-eye"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Pacchetto sensoriale</h4>
+                                <p>Telecamere, radar, lidar, sonar, GPS, sensori inerziali</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-server"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Unità di elaborazione</h4>
+                                <p>Computer di bordo, microcontrollori, GPU</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-broadcast-tower"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Sistemi di comunicazione</h4>
+                                <p>Radio, collegamenti satellitari, reti mesh</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-cog"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Sistemi di attuazione</h4>
+                                <p>Motori, servocomandi, bracci robotici</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-desktop"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Interfaccia uomo-macchina</h4>
+                                <p>Console di controllo, visori, tablet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box info-box-definition reveal">
+                <h4><i class="fas fa-book"></i> Livelli di autonomia</h4>
+                <p>In funzione della quantità di decisioni prese dal robot in autonomia, distinguiamo:</p>
+                <ul class="styled-list">
+                    <li><strong>Teleoperazione:</strong> l'operatore controlla ogni movimento</li>
+                    <li><strong>Autonomia assistita:</strong> il robot aiuta in compiti come stabilizzazione ed evitamento ostacoli</li>
+                    <li><strong>Autonomia supervisata:</strong> l'umano definisce la missione, il robot pianifica i dettagli</li>
+                    <li><strong>Autonomia piena:</strong> il sistema decide in modo indipendente, entro alcuni limiti preimpostati</li>
+                </ul>
+            </div>
+
+            <div class="card reveal">
+                <h3><i class="fas fa-radar"></i> Sensori nei sistemi militari</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo di sensore</th>
+                                <th>Uso principale in ambito militare</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Sensori elettro-ottici</strong></td>
+                                <td>Telecamere nel visibile e nel vicino infrarosso. Utili per sorveglianza e identificazione di bersagli.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sensori termici (IR)</strong></td>
+                                <td>Rilevano radiazione termica. Essenziali per operazioni notturne e per individuare persone o veicoli nascosti.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Radar</strong></td>
+                                <td>Usano onde radio per misurare distanza e velocità. Funzionano anche in condizioni atmosferiche sfavorevoli.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lidar</strong></td>
+                                <td>Impulsi laser per mappe 3D dell'ambiente. Fondamentali per navigazione autonoma.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>GPS e IMU</strong></td>
+                                <td>Posizionamento assoluto e misura di accelerazioni/rotazioni per navigazione precisa.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sensori chimici/radiologici</strong></td>
+                                <td>Rilevano agenti chimici, biologici o radioattivi in aree contaminate.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <h3><i class="fas fa-walking"></i> Locomozione</h3>
+                    <div class="content-block">
+                        <h4>Terrestre (UGV)</h4>
+                        <ul class="styled-list">
+                            <li><strong>Ruote:</strong> spostamenti rapidi su strade</li>
+                            <li><strong>Cingoli:</strong> mobilità fuoristrada</li>
+                            <li><strong>Zampe robotiche:</strong> ambienti irregolari</li>
+                        </ul>
+
+                        <h4>Aerea (UAV)</h4>
+                        <ul class="styled-list">
+                            <li><strong>Multirotore:</strong> maneggevoli, decollo verticale</li>
+                            <li><strong>Ala fissa:</strong> grande autonomia</li>
+                            <li><strong>VTOL:</strong> ibridi con vantaggi combinati</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-industry"></i> Industria 4.0</h3>
+                    <div class="content-block">
+                        <div class="info-box info-box-key">
+                            <h4><i class="fas fa-lightbulb"></i> Dalla fabbrica al campo di battaglia</h4>
+                            <p>Le tecnologie dell'Industria 4.0 stanno trasformando la difesa, dando vita al concetto di <strong>Difesa 4.0</strong>.</p>
+                        </div>
+                        <ul class="styled-list">
+                            <li><strong>Stampa 3D:</strong> pezzi di ricambio on-demand</li>
+                            <li><strong>Digital twin:</strong> simulazioni prima dello schieramento</li>
+                            <li><strong>Manutenzione predittiva:</strong> riduzione tempi di fermo</li>
+                            <li><strong>Logistica automatizzata:</strong> reti intelligenti</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Applications Section -->
+    <section id="applicazioni" class="section-alt">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Applicazioni nel Campo Militare</h2>
+                <p>Come vengono utilizzati i robot in ambito militare</p>
+            </div>
+
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <h3><i class="fas fa-truck-monster"></i> Veicoli terrestri (UGV)</h3>
+                    <div class="content-block">
+                        <h4>Neutralizzazione ordigni</h4>
+                        <p>UGV con bracci manipolatori per ispezionare e neutralizzare ordigni esplosivi improvvisati (IED) in sicurezza.</p>
+
+                        <h4>Ricognizione</h4>
+                        <p>Piccoli robot lanciabili che entrano in edifici, tunnel e strutture collassate prima dei soldati.</p>
+
+                        <h4>Supporto logistico</h4>
+                        <p>Veicoli autonomi che trasportano munizioni, viveri e materiale medico, riducendo il personale necessario.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-helicopter"></i> Droni aerei (UAV)</h3>
+                    <div class="content-block">
+                        <h4>Ricognizione a lunga durata</h4>
+                        <p>Grandi UAV che sorvegliano vaste aree per ore o giorni, raccogliendo immagini in tempo reale.</p>
+
+                        <h4>Supporto tattico</h4>
+                        <p>Droni trasportabili nello zaino che forniscono visione oltre ostacoli e individuano imboscate.</p>
+
+                        <h4>Sciami di droni</h4>
+                        <p>Gruppi di UAV che cooperano autonomamente per saturare difese o mappare aree rapidamente.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <h3><i class="fas fa-ship"></i> Robot navali e subacquei</h3>
+                    <div class="content-block">
+                        <h4>Veicoli di superficie (USV)</h4>
+                        <ul class="styled-list">
+                            <li>Pattugliamento di porti e coste</li>
+                            <li>Identificazione imbarcazioni sospette</li>
+                            <li>Operazioni di sminamento marittimo</li>
+                        </ul>
+
+                        <h4>Veicoli subacquei (UUV)</h4>
+                        <ul class="styled-list">
+                            <li>Mappatura fondali marini</li>
+                            <li>Localizzazione mine subacquee</li>
+                            <li>Ispezione cavi e sensori</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-user-ninja"></i> Esoscheletri militari</h3>
+                    <div class="content-block">
+                        <p>Strutture meccaniche indossabili che amplificano le capacità del soldato:</p>
+                        <ul class="styled-list">
+                            <li>Trasporto di carichi pesanti senza affaticamento</li>
+                            <li>Riduzione del rischio di infortuni muscolari</li>
+                            <li>Integrazione di armature protettive</li>
+                            <li>Aumento di velocità e resistenza</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Evolution Section -->
+    <section id="evoluzione" class="section-dark">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Evoluzione e Tendenze Future</h2>
+                <p>Dal passato al futuro della robotica militare</p>
+            </div>
+
+            <div class="card reveal">
+                <h3><i class="fas fa-history"></i> Evoluzione storica</h3>
+                <div class="content-block">
+                    <div class="grid-3">
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-calendar-alt"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Prima e Seconda Guerra Mondiale</h4>
+                                <p>Bombe radiocomandate e veicoli esplosivi teleguidati</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-calendar-alt"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Guerra Fredda</h4>
+                                <p>Droni da ricognizione pilotati a distanza</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Anni 2000+</h4>
+                                <p>Droni aerei e robot anti-ordigno nelle operazioni standard</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <h3><i class="fas fa-brain"></i> Intelligenza Artificiale</h3>
+                    <div class="content-block">
+                        <p>L'IA sta rivoluzionando la robotica militare con capacità di:</p>
+                        <ul class="styled-list">
+                            <li>Riconoscimento veicoli e persone in tempo reale</li>
+                            <li>Previsione di traiettorie e comportamenti</li>
+                            <li>Scelta autonoma di manovre ottimali</li>
+                        </ul>
+
+                        <div class="info-box info-box-note">
+                            <h4><i class="fas fa-info-circle"></i> Questioni aperte</h4>
+                            <ul class="styled-list">
+                                <li>Come evitare errori nell'identificazione?</li>
+                                <li>Chi è responsabile per decisioni automatiche?</li>
+                                <li>È etico delegare scelte letali alle macchine?</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-project-diagram"></i> Swarm Robotics</h3>
+                    <div class="content-block">
+                        <p>Sciami di robot che cooperano ispirandosi a insetti e uccelli:</p>
+                        <ul class="styled-list">
+                            <li>Sciami di micro-droni per saturare difese aeree</li>
+                            <li>Gruppi di veicoli per esplorazione parallela</li>
+                            <li>Reti di sensori autonomi distribuiti</li>
+                        </ul>
+                        <p><strong>Sfida:</strong> Mantenere il controllo umano su sistemi così complessi.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card reveal">
+                <h3><i class="fas fa-shield-alt"></i> Difesa contro i robot</h3>
+                <div class="content-block">
+                    <div class="grid-2">
+                        <div>
+                            <h4>Sistemi anti-drone</h4>
+                            <ul class="styled-list">
+                                <li>Sensori di scoperta (radar, lidar, acustici)</li>
+                                <li>Contromisure elettroniche (jamming)</li>
+                                <li>Soluzioni fisiche (proiettili, reti, droni cacciatori)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Cyber-sicurezza</h4>
+                            <ul class="styled-list">
+                                <li>Protezione da intrusioni software</li>
+                                <li>Prevenzione manipolazione sensori</li>
+                                <li>Sicurezza comunicazioni radio/satellitari</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pros & Cons Section -->
+    <section id="pro-contro">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Pro e Contro</h2>
+                <p>Un'analisi bilanciata della robotica militare</p>
+            </div>
+
+            <div class="pros-cons-container reveal">
+                <div class="pros-box">
+                    <h3><i class="fas fa-thumbs-up"></i> Vantaggi</h3>
+                    <ul>
+                        <li><strong>Maggiore efficienza e precisione:</strong> i robot non si stancano e possono eseguire movimenti estremamente accurati.</li>
+                        <li><strong>Riduzione dei rischi:</strong> il personale umano è protetto in attività pericolose come sminamento ed esplorazione di aree contaminate.</li>
+                        <li><strong>Operatività continua:</strong> capacità di operare 24/7 con manutenzione ottimizzata.</li>
+                        <li><strong>Nuove capacità:</strong> esplorazione di ambienti estremi (profondità marine, zone radioattive) inaccessibili agli umani.</li>
+                        <li><strong>Precisione chirurgica:</strong> riduzione dei danni collaterali nelle operazioni mirate.</li>
+                    </ul>
+                </div>
+
+                <div class="cons-box">
+                    <h3><i class="fas fa-thumbs-down"></i> Svantaggi</h3>
+                    <ul>
+                        <li><strong>Impatto occupazionale:</strong> potenziale perdita di posti di lavoro in ambito logistico e di supporto.</li>
+                        <li><strong>Costi elevati:</strong> sviluppo, acquisizione e manutenzione richiedono investimenti significativi.</li>
+                        <li><strong>Vulnerabilità tecnologica:</strong> rischio di guasti, disturbi elettronici e attacchi informatici.</li>
+                        <li><strong>Questioni etiche:</strong> dilemmi morali sull'uso di sistemi d'arma autonomi letali.</li>
+                        <li><strong>Proliferazione:</strong> rischio di corsa agli armamenti e accesso da parte di attori non statali.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <h3><i class="fas fa-briefcase"></i> Impatti economici</h3>
+                    <div class="content-block">
+                        <p>La robotica militare ha effetti contrastanti:</p>
+                        <ul class="styled-list">
+                            <li>Riduzione di ruoli tradizionali (autisti, operatori)</li>
+                            <li>Creazione di nuove professioni specializzate</li>
+                            <li>Ricadute positive nel settore civile</li>
+                            <li>Investimenti in ricerca e sviluppo</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-balance-scale"></i> Questioni etiche e legali</h3>
+                    <div class="content-block">
+                        <h4>Diritto internazionale umanitario</h4>
+                        <p>Principi fondamentali:</p>
+                        <ul class="styled-list">
+                            <li><strong>Distinzione</strong> tra civili e combattenti</li>
+                            <li><strong>Proporzionalità</strong> nell'uso della forza</li>
+                            <li><strong>Precauzione</strong> per limitare danni collaterali</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box info-box-key reveal">
+                <h4><i class="fas fa-lightbulb"></i> Bilancio complessivo</h4>
+                <ul class="styled-list">
+                    <li>La robotica militare può <strong>ridurre i rischi</strong> per i soldati e migliorare la <strong>precisione</strong> degli interventi</li>
+                    <li>Allo stesso tempo può <strong>facilitare l'uso della forza</strong> e aumentare la <strong>complessità dei conflitti</strong></li>
+                    <li>Il punto decisivo è garantire un <strong>controllo umano significativo</strong> e sviluppare <strong>regole internazionali condivise</strong></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusions Section -->
+    <section id="conclusioni" class="section-alt">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Conclusioni</h2>
+                <p>Riflessioni finali sul futuro della robotica militare</p>
+            </div>
+
+            <div class="card reveal">
+                <h3><i class="fas fa-flag-checkered"></i> Sintesi finale</h3>
+                <div class="content-block">
+                    <p>La robotica militare rappresenta uno dei fronti più avanzati e controversi dell'automazione contemporanea.</p>
+
+                    <p>Dall'analisi svolta emergono alcuni elementi fondamentali:</p>
+
+                    <div class="grid-2">
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Protezione del personale</h4>
+                                <p>I robot offrono nuove possibilità operative per proteggere i soldati e raccogliere informazioni in sicurezza.</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-industry"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Convergenza tecnologica</h4>
+                                <p>L'integrazione tra Industria 4.0 e Difesa sta trasformando produzione e operazioni militari.</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-question-circle"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Interrogativi etici</h4>
+                                <p>L'autonomia crescente solleva domande su responsabilità e controllo politico della forza.</p>
+                            </div>
+                        </div>
+                        <div class="icon-block">
+                            <div class="icon-block-icon"><i class="fas fa-users"></i></div>
+                            <div class="icon-block-content">
+                                <h4>Scelte future</h4>
+                                <p>Governi e società civile determineranno l'uso responsabile di queste tecnologie.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box info-box-note">
+                        <h4><i class="fas fa-graduation-cap"></i> Messaggio per gli studenti</h4>
+                        <p>Per chi si avvicina a questo tema è importante sviluppare non solo competenze tecniche, ma anche una forte <strong>consapevolezza etica</strong>. Studiare la robotica militare significa interrogarsi sul rapporto tra esseri umani, tecnologia e responsabilità nelle decisioni più delicate: quelle che riguardano la vita e la morte.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Glossary Section -->
+    <section id="glossario" class="section-dark">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Glossario</h2>
+                <p>Termini principali della robotica militare</p>
+            </div>
+
+            <div class="glossary-grid reveal">
+                <div class="glossary-item">
+                    <dt>Robot</dt>
+                    <dd>Macchina programmabile in grado di percepire l'ambiente, elaborare informazioni ed eseguire azioni fisiche autonome o semi-autonome.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>UGV</dt>
+                    <dd><em>Unmanned Ground Vehicle</em>, veicolo terrestre senza equipaggio.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>UAV</dt>
+                    <dd><em>Unmanned Aerial Vehicle</em>, drone aereo senza equipaggio.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>USV</dt>
+                    <dd><em>Unmanned Surface Vehicle</em>, veicolo di superficie senza equipaggio.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>UUV</dt>
+                    <dd><em>Unmanned Underwater Vehicle</em>, veicolo subacqueo senza equipaggio.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>Industria 4.0</dt>
+                    <dd>Insieme di tecnologie (IoT, big data, IA, robotica avanzata, stampa 3D) che digitalizzano e automatizzano i processi produttivi.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>Difesa 4.0</dt>
+                    <dd>Applicazione dei principi dell'Industria 4.0 al settore militare e alla logistica della difesa.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>LAWS</dt>
+                    <dd><em>Lethal Autonomous Weapon Systems</em>, sistemi d'arma autonomi letali capaci di selezionare e ingaggiare bersagli autonomamente.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>Swarm Robotics</dt>
+                    <dd>Robotica degli sciami, che studia la cooperazione di molti robot relativamente semplici ispirati al comportamento di insetti sociali.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>Manutenzione Predittiva</dt>
+                    <dd>Manutenzione basata sull'analisi dei dati dei sensori per prevedere e prevenire i guasti prima che si verifichino.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>GPS</dt>
+                    <dd><em>Global Positioning System</em>, sistema di posizionamento satellitare utilizzato per determinare la posizione precisa.</dd>
+                </div>
+                <div class="glossary-item">
+                    <dt>IMU</dt>
+                    <dd><em>Inertial Measurement Unit</em>, unità che misura accelerazioni e rotazioni per stimare spostamenti e assetto del veicolo.</dd>
+                </div>
+            </div>
+
+            <div class="card reveal" style="margin-top: 3rem;">
+                <h3><i class="fas fa-book-open"></i> Bibliografia Essenziale</h3>
+                <div class="content-block">
+                    <ul>
+                        <li>Comitato Internazionale della Croce Rossa, <em>Autonomous weapon systems: Implications of increasing autonomy in the critical functions of weapons</em>, vari rapporti.</li>
+                        <li>Nazioni Unite, <em>Group of Governmental Experts on Lethal Autonomous Weapons Systems</em>, documenti di lavoro e raccomandazioni.</li>
+                        <li>International Federation of Robotics, <em>World Robotics Reports</em>, varie edizioni.</li>
+                        <li>SIPRI (Stockholm International Peace Research Institute), <em>Yearbook</em>, capitoli su spesa militare e tecnologie emergenti.</li>
+                        <li>P. W. Singer, <em>Wired for War: The Robotics Revolution and Conflict in the 21st Century</em>, Penguin Books.</li>
+                        <li>M. L. Cummings, articoli sulla supervisione umana dei sistemi autonomi in ambito militare.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-icon">
+            <i class="fas fa-robot"></i>
+        </div>
+        <h3>La Robotica nel Campo Militare</h3>
+        <p>Progetto Finale di Tecnologia</p>
+        <p>Anno Scolastico 2024/2025</p>
+        <div class="footer-team">
+            <p><i class="fas fa-users"></i> Federico Nardullo • Luca Cremaschi • Niccolò Decano • Diego Ripamonti</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+
+        // Active navigation highlighting
+        window.addEventListener('scroll', () => {
+            let current = '';
+            document.querySelectorAll('section').forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Scroll reveal animation
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            revealElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const revealPoint = 100;
+                
+                if (elementTop < windowHeight - revealPoint) {
+                    element.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll(); // Initial check
+    </script>
+
+</body>
+</html>
