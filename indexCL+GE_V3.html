@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARES | ROBOTICA MILITARE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #0f0f0f;
+            --surface-highlight: #161616;
+            --accent: #ff9d00; /* Amber Safety */
+            --accent-dim: rgba(255, 157, 0, 0.1);
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border: 1px solid rgba(255, 255, 255, 0.1);
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-body: 'Manrope', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        /* --- BASE SETUP --- */
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body {
+            background-color: var(--bg); color: var(--text-main);
+            font-family: var(--font-body); line-height: 1.8;
+            overflow-x: hidden; margin: 0;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border: 1px solid #000; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* --- BACKGROUNDS --- */
+        #network-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; opacity: 0.3; pointer-events: none;
+        }
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.3));
+            background-size: 100% 4px;
+            z-index: 9000; pointer-events: none; opacity: 0.4;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; left: 0; top: 0; height: 100vh; width: 80px;
+            background: var(--surface); border-right: var(--border);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .logo-box {
+            position: absolute; top: 0; left: 0; width: 100%; height: 80px;
+            background: var(--accent); color: black; display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem;
+        }
+        .nav-item {
+            writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
+            padding: 25px 0; color: var(--text-muted); text-decoration: none;
+            font-family: var(--font-heading); font-size: 0.85rem; letter-spacing: 2px;
+            transition: 0.3s; border-left: 3px solid transparent;
+            text-transform: uppercase; width: 100%; text-align: center;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: var(--accent); background: rgba(255, 157, 0, 0.05); border-left-color: var(--accent);
+        }
+
+        /* --- LAYOUT --- */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; position: relative; }
+        h1, h2, h3, h4 { font-family: var(--font-heading); text-transform: uppercase; letter-spacing: -1px; margin: 0; }
+        
+        /* --- HERO --- */
+        header {
+            min-height: 100vh; display: flex; align-items: center; padding-left: 100px; position: relative;
+        }
+        .hero-meta {
+            font-family: var(--font-code); color: var(--accent); margin-bottom: 20px; display: flex; align-items: center; gap: 15px;
+        }
+        .hero-line { height: 1px; width: 40px; background: var(--accent); }
+        h1.mega-title {
+            font-size: clamp(3.5rem, 7vw, 6rem); line-height: 0.95; font-weight: 800; margin-bottom: 30px;
+            color: white; text-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .hero-desc {
+            font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px;
+            line-height: 1.6; max-width: 800px; border-left: 2px solid #333; padding-left: 20px;
+        }
+
+        /* --- SECTIONS --- */
+        section { padding: 100px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-left: 80px; }
+        .section-header { margin-bottom: 60px; }
+        .section-subtitle { font-family: var(--font-code); color: var(--accent); margin-bottom: 10px; font-size: 0.9rem; }
+        .section-title { font-size: 3rem; color: white; }
+
+        /* --- IMAGE HOLDERS (TACTICAL STYLE) --- */
+        .tactical-img {
+            width: 100%; height: 250px; background: #111; margin-bottom: 20px;
+            position: relative; overflow: hidden; border: 1px solid #333;
+        }
+        .tactical-img img {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: grayscale(100%) contrast(1.2) brightness(0.8); transition: 0.5s;
+        }
+        .tactical-img:hover img { filter: grayscale(0%) contrast(1) brightness(1); }
+        .img-overlay {
+            position: absolute; bottom: 10px; left: 10px; font-family: var(--font-code);
+            font-size: 0.7rem; color: var(--accent); background: rgba(0,0,0,0.7); padding: 2px 5px;
+        }
+        .rec-dot {
+            position: absolute; top: 10px; right: 10px; color: red; font-family: var(--font-code);
+            font-size: 0.8rem; animation: blink 1s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- DOSSIER EXPANDABLE --- */
+        .dossier-card {
+            background: rgba(20, 20, 20, 0.6); border: 1px solid rgba(255,255,255,0.1); padding: 40px;
+            transition: 0.3s; margin-bottom: 30px;
+        }
+        .dossier-card:hover { border-color: var(--accent); }
+        .dossier-head h3 { font-size: 1.8rem; color: white; margin-bottom: 10px; }
+        
+        .expand-btn {
+            background: transparent; border: 1px solid var(--accent); color: var(--accent);
+            padding: 12px 30px; font-family: var(--font-code); cursor: pointer; margin-top: 15px;
+            font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; letter-spacing: 1px;
+            position: relative; overflow: hidden;
+        }
+        .expand-btn:hover { background: var(--accent); color: black; font-weight: bold; }
+
+        .dossier-body {
+            max-height: 0; overflow: hidden; transition: max-height 0.8s ease-in-out;
+            color: var(--text-muted); font-size: 1.05rem;
+        }
+        .dossier-body.open { max-height: 3000px; margin-top: 30px; padding-top: 30px; border-top: 1px solid #333; }
+        .dossier-body ul { list-style: none; padding: 20px; background: rgba(255,255,255,0.03); margin: 20px 0; }
+        .dossier-body li { margin-bottom: 12px; padding-left: 20px; position: relative; }
+        .dossier-body li::before { content: '>'; position: absolute; left: 0; color: var(--accent); font-family: var(--font-code); }
+
+        /* --- VERTICAL TIMELINE --- */
+        .timeline { position: relative; max-width: 900px; margin: 0 auto; padding: 40px 0; }
+        .timeline::before {
+            content: ''; position: absolute; top: 0; bottom: 0; left: 20px; width: 2px; background: #333;
+        }
+        .tl-item { position: relative; padding-left: 60px; margin-bottom: 60px; }
+        .tl-dot {
+            position: absolute; left: 11px; top: 0; width: 20px; height: 20px;
+            background: var(--bg); border: 2px solid var(--accent); border-radius: 50%; z-index: 2;
+        }
+        .tl-date { font-family: var(--font-code); color: var(--accent); font-size: 1.1rem; margin-bottom: 10px; font-weight: bold; }
+        .tl-content h4 { font-size: 1.4rem; color: white; margin-bottom: 10px; }
+        .tl-content p { font-size: 1rem; color: var(--text-muted); }
+
+        /* --- PRO/CONS --- */
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .comp-col { padding: 30px; border: 1px solid #333; }
+        .comp-col.pro { border-top: 4px solid #00ff88; background: rgba(0, 255, 136, 0.02); }
+        .comp-col.con { border-top: 4px solid #ff3333; background: rgba(255, 51, 51, 0.02); }
+
+        /* --- FOOTER --- */
+        footer { padding: 80px 0 40px 80px; background: #020202; border-top: 1px solid #222; }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-top: 40px; }
+        .team-card { border-left: 2px solid var(--accent); padding-left: 20px; transition: 0.3s; }
+        .team-card:hover { background: rgba(255, 157, 0, 0.05); }
+        .team-role { font-family: var(--font-code); font-size: 0.7rem; color: var(--accent); display: block; margin-bottom: 5px; letter-spacing: 1px;}
+        .team-name { font-family: var(--font-heading); font-size: 1.2rem; font-weight: bold; color: white; }
+
+        @media(max-width: 768px) {
+            .sidebar { display: none; }
+            header, section, footer { padding-left: 20px; padding-right: 20px; }
+            h1.mega-title { font-size: 3rem; }
+        }
+
+        /* --- QUIZ STYLES --- */
+        .quiz-question { padding: 20px; background: rgba(255,255,255,0.02); border-left: 3px solid #333; margin-bottom: 10px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .quiz-btn {
+            background: transparent; border: 1px solid #444; color: var(--text-muted);
+            padding: 15px 20px; text-align: left; cursor: pointer; transition: 0.3s;
+            font-family: var(--font-body); font-size: 1rem;
+        }
+        .quiz-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .quiz-btn.correct { background: rgba(0, 255, 136, 0.2); border-color: #00ff88; color: #00ff88; }
+        .quiz-btn.wrong { background: rgba(255, 51, 51, 0.2); border-color: #ff3333; color: #ff3333; }
+        .quiz-btn.disabled { pointer-events: none; opacity: 0.7; }
+        .quiz-feedback { margin-top: 15px; padding: 10px; font-size: 0.9rem; display: none; }
+        .quiz-feedback.show { display: block; }
+
+        /* --- OPINION STYLES --- */
+        .opinion-question { padding: 20px; background: rgba(255,255,255,0.02); border-left: 3px solid var(--accent); margin-bottom: 10px; }
+        .opinion-options { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .opinion-btn {
+            background: transparent; border: 1px solid #444; color: var(--text-muted);
+            padding: 15px 20px; text-align: left; cursor: pointer; transition: 0.3s;
+            font-family: var(--font-body); font-size: 1rem;
+        }
+        .opinion-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .opinion-btn.selected { background: rgba(255, 157, 0, 0.2); border-color: var(--accent); color: var(--accent); }
+        .opinion-btn.disabled { pointer-events: none; opacity: 0.6; }
+    </style>
+</head>
+<body>
+
+    <canvas id="network-canvas"></canvas>
+    <div class="scanlines"></div>
+
+    <nav class="sidebar">
+        <div class="logo-box">ARES</div>
+        <a href="#hero" class="nav-item active">MISSIONE</a>
+        <a href="#tech" class="nav-item">TECH</a>
+        <a href="#apps" class="nav-item">DOMINI</a>
+        <a href="#evolution" class="nav-item">STORIA</a>
+        <a href="#analysis" class="nav-item">ANALISI</a>
+        <a href="#conclusions" class="nav-item">FINE</a>
+        <a href="#quiz" class="nav-item">QUIZ</a>
+        <a href="#footer" class="nav-item">TEAM</a>
+    </nav>
+
+    <!-- HERO (Capitolo 1) -->
+    <header id="hero">
+        <div class="container">
+            <div class="hero-meta">
+                <div class="hero-line"></div>
+                PROGETTO FINALE DI TECNOLOGIA // GRUPPO #8
+            </div>
+            <h1 class="mega-title">LA ROBOTICA NEL<br><span style="color: var(--accent);">CAMPO MILITARE</span></h1>
+            <div class="hero-desc">
+                <p>
+                    <strong>Che cos’è la robotica:</strong> La robotica è la disciplina dell’ingegneria che studia e sviluppa metodi che permettano a un robot di eseguire dei compiti specifici riproducendo in modo automatico il lavoro umano.
+                </p>
+                <p>
+                    In termini generali, un robot è una macchina programmabile capace di percepire l’ambiente (sensori), elaborare informazioni (controllo) e compiere azioni fisiche (attuatori).
+                </p>
+                <p>
+                    <strong>Applicazioni militari:</strong> Nel settore militare i robot vengono utilizzati per ricognizione, supporto logistico, neutralizzazione ordigni, difesa aerea e navale, e in alcuni casi come sistemi d'arma.
+                </p>
+                <p>
+                    <strong>Innovazioni recenti:</strong> Negli ultimi vent’anni la robotica militare è stata trasformata da droni, IA e reti sicure, portando al dibattito sui sistemi L.A.W.S. (Lethal Autonomous Weapon Systems).
+                </p>
+            </div>
+            <button class="expand-btn" onclick="document.getElementById('tech').scrollIntoView()">AVVIA ANALISI TECNICA</button>
+        </div>
+    </header>
+
+    <!-- TECNOLOGIE (Capitolo 2) -->
+    <section id="tech">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-subtitle">CAPITOLO 02</div>
+                <h2 class="section-title">TECNOLOGIE E COMPONENTI</h2>
+            </div>
+
+            <div class="dossier-card">
+                <div class="tactical-img">
+                    <img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=1000&h=400&fit=crop" alt="Robot Structure">
+                    <div class="img-overlay">SYSTEM ARCHITECTURE</div>
+                    <div class="rec-dot">REC</div>
+                </div>
+                <div class="dossier-head">
+                    <h3>STRUTTURA DI BASE</h3>
+                </div>
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] APRI ARCHITETTURA</button>
+                <div class="dossier-body">
+                    <p>Indipendentemente dal dominio operativo (terra, aria, mare), un sistema robotico militare comprende:</p>
+                    <ul>
+                        <li><strong>Piattaforma meccanica:</strong> Carrello cingolato, drone ad ala fissa, scafo navale, esoscheletro.</li>
+                        <li><strong>Pacchetto sensoriale:</strong> Telecamere, radar, lidar, sonar, GPS, sensori inerziali.</li>
+                        <li><strong>Unità di elaborazione:</strong> Computer di bordo, microcontrollori, GPU.</li>
+                        <li><strong>Sistemi di comunicazione:</strong> Radio, collegamenti satellitari, reti mesh.</li>
+                        <li><strong>Sistemi di attuazione:</strong> Motori, servocomandi, bracci robotici, stabilizzazione.</li>
+                        <li><strong>Interfaccia uomo-macchina:</strong> Console di controllo, visori, tablet, comandi vocali.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dossier-card">
+                <div class="tactical-img">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1000&h=400&fit=crop" alt="Sensori">
+                    <div class="img-overlay">OPTICAL / THERMAL / LIDAR</div>
+                    <div class="rec-dot">REC</div>
+                </div>
+                <div class="dossier-head">
+                    <h3>SENSORI NEI SISTEMI MILITARI</h3>
+                </div>
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] APRI DATI SENSORI</button>
+                <div class="dossier-body">
+                    <p>Ecco i sensori principali utilizzati nella robotica militare:</p>
+                    <ul>
+                        <li><strong>Sensori elettro-ottici:</strong> Telecamere nel visibile e nel vicino infrarosso montate su torrette stabilizzate. Utili per sorveglianza e identificazione.</li>
+                        <li><strong>Sensori termici (IR):</strong> Camere a infrarosso termico che rilevano la radiazione emessa dagli oggetti. Essenziali per operazioni notturne.</li>
+                        <li><strong>Radar:</strong> Usano onde radio per misurare distanza e velocità. Rilevano bersagli a grande distanza anche con meteo avverso.</li>
+                        <li><strong>Lidar:</strong> Impiegano impulsi laser per costruire mappe 3D dell’ambiente. Fondamentali per la navigazione autonoma.</li>
+                        <li><strong>Sensori chimici e radiologici:</strong> Rilevano agenti NBCR monitorando aree contaminate senza esporre i soldati.</li>
+                        <li><strong>GPS e IMU:</strong> Il GPS fornisce la posizione assoluta; le unità di misura inerziali (IMU) misurano accelerazioni e rotazioni per navigazione quando il segnale GPS non è affidabile.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dossier-card">
+                <div class="dossier-head">
+                    <h3>ATTUATORI E LOCOMOZIONE</h3>
+                </div>
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] APRI SISTEMI DI MOVIMENTO</button>
+                <div class="dossier-body">
+                    <p>Gli attuatori trasformano i comandi dell'unità di controllo in movimenti o altre azioni:</p>
+                    <ul>
+                        <li><strong>Locomozione terrestre (UGV):</strong> Ruote per spostamenti rapidi; cingoli per mobilità fuoristrada; zampe robotiche per ambienti irregolari (macerie, scale).</li>
+                        <li><strong>Locomozione aerea (UAV):</strong> Multirotore (maneggevoli, decollo verticale); ala fissa (lunghe distanze); configurazioni ibride VTOL.</li>
+                        <li><strong>Sistemi navali (USV/UUV):</strong> Eliche, timoni e controllo profondità. Alcuni modelli imitano il movimento dei pesci per maggiore silenziosità.</li>
+                        <li><strong>Manipolatori ed esoscheletri:</strong> Bracci robotici per oggetti pericolosi (IED); esoscheletri che amplificano la forza del soldato.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dossier-card">
+                <div class="dossier-head">
+                    <h3>SISTEMI DI CONTROLLO E AUTONOMIA</h3>
+                </div>
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] APRI DETTAGLI CONTROLLO</button>
+                <div class="dossier-body">
+                    <p>Il sistema di controllo è il "cervello" del robot. Distinguiamo 4 livelli:</p>
+                    <ul>
+                        <li><strong>Teleoperazione:</strong> L'operatore invia in tempo reale tutti i comandi (es. veicolo radiocomandato).</li>
+                        <li><strong>Autonomia assistita:</strong> Il sistema stabilizza il movimento o evita ostacoli; l'operatore definisce l'obiettivo.</li>
+                        <li><strong>Autonomia supervisata:</strong> L'umano assegna missioni di alto livello ("sorveglia area"); il robot pianifica i percorsi.</li>
+                        <li><strong>Autonomia piena:</strong> Il sistema sceglie da solo come eseguire la missione. In ambito d'arma è oggetto di forte dibattito etico (LAWS).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dossier-card">
+                <div class="dossier-head">
+                    <h3>COMUNICAZIONI E RETI</h3>
+                </div>
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] APRI DETTAGLI COMUNICAZIONI</button>
+                <div class="dossier-body">
+                    <p>Per funzionare efficacemente, i robot militari devono scambiare grandi quantità di dati:</p>
+                    <ul>
+                        <li><strong>Radio e satelliti:</strong> Comunicazioni in varie bande o tramite collegamenti satellitari.</li>
+                        <li><strong>Reti mesh:</strong> Ogni robot funge da nodo che ritrasmette il segnale, estendendo la copertura.</li>
+                        <li><strong>Sicurezza informatica:</strong> Crittografia, autenticazione e protezione contro disturbi (jamming) o manipolazioni (spoofing).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dossier-card">
+                <div class="tactical-img">
+                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1000&h=400&fit=crop" alt="Industry 4.0">
+                    <div class="img-overlay">INDUSTRY 4.0 // DIGITAL TWIN</div>
+                </div>
+                <div class="dossier-head">
+                    <h3>INDUSTRIA 4.0 E DIFESA</h3>
+                </div>
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] APRI DIFESA 4.0</button>
+                <div class="dossier-body">
+                    <p>L'Industria 4.0 (IoT, AI, Big Data) sta trasformando anche il settore della difesa:</p>
+                    <ul>
+                        <li><strong>Produzione additiva:</strong> Stampa 3D di ricambi direttamente in teatro operativo.</li>
+                        <li><strong>Digital Twin:</strong> Gemelli digitali per simulare il comportamento di robot e veicoli.</li>
+                        <li><strong>Manutenzione predittiva:</strong> Analisi dati per prevenire guasti prima che si verifichino.</li>
+                        <li><strong>Logistica automatizzata:</strong> Integrazione dei robot in reti simili ai magazzini robotizzati civili.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- APPLICAZIONI (Capitolo 3) -->
+    <section id="apps">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-subtitle">CAPITOLO 03</div>
+                <h2 class="section-title">DOMINI OPERATIVI</h2>
+            </div>
+
+            <!-- UGV -->
+            <div class="dossier-card">
+                <div class="tactical-img">
+                    <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1000&h=400&fit=crop" alt="UGV">
+                    <div class="img-overlay">CAM_01 // GROUND</div>
+                </div>
+                <h3>VEICOLI TERRESTRI (UGV)</h3>
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] ANALISI UGV</button>
+                <div class="dossier-body">
+                    <ul>
+                        <li><strong>Neutralizzazione Ordigni (EOD):</strong> UGV cingolati con bracci manipolatori per ispezionare, prelevare e neutralizzare IED, mantenendo l'artificiere al sicuro.</li>
+                        <li><strong>Ricognizione:</strong> Piccoli robot lanciabili per esplorare edifici, tunnel e grotte prima dell'ingresso delle truppe.</li>
+                        <li><strong>Supporto Logistico:</strong> Veicoli autonomi per trasporto munizioni, viveri e materiale medico (convogli autonomi).</li>
+                        <li><strong>Sistemi Armati:</strong> Piattaforme con torrette remote (mitragliatrici, lanciagranate) per difesa punti sensibili.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- UAV -->
+            <div class="dossier-card">
+                <div class="tactical-img">
+                    <img src="https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=1000&h=400&fit=crop" alt="UAV">
+                    <div class="img-overlay">CAM_02 // AIR // ALT: 15000FT</div>
+                </div>
+                <h3>DRONI AEREI (UAV)</h3>
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] ANALISI UAV</button>
+                <div class="dossier-body">
+                    <ul>
+                        <li><strong>Ricognizione Lunga Durata:</strong> Grandi UAV ad ala fissa per sorveglianza continua (24h+) di vaste aree e confini.</li>
+                        <li><strong>Supporto alle Unità:</strong> Droni da zaino lanciati dalle squadre per osservare oltre colline e guidare l'artiglieria.</li>
+                        <li><strong>Sistema d'Arma:</strong> UAV armati con missili guidati. L'operatore valuta danni e autorizza l'impiego.</li>
+                        <li><strong>Munizioni Circuitanti:</strong> Droni "Kamikaze" che sorvolano un'area in attesa e colpiscono il bersaglio identificato.</li>
+                    </ul>
+                    <div>
+                        <section id="model-3d" style="margin-right: 80px;">
+                            <div class="container">
+                                <div class="section-header">
+                                    <div class="section-subtitle">CAPITOLO 02.5 // VISUALIZZAZIONE 3D</div>
+                                    <h2 class="section-title">MQ-9 REAPER</h2>
+                                </div>
+
+                                <div class="dossier-card">
+                                    <div style="position: relative; width: 100%; height: 600px; background: #000; border: 1px solid #333; overflow: hidden;">
+                                        
+                                        <div style="position: absolute; top: 10px; left: 10px; font-family: var(--font-code); font-size: 0.7rem; color: var(--accent); background: rgba(0,0,0,0.8); padding: 5px 10px; z-index: 100; border: 1px solid rgba(255,157,0,0.3);">
+                                            3D TACTICAL VIEW // MQ-9 REAPER UAV
+                                        </div>
+                                        
+                                        <div style="position: absolute; top: 10px; right: 10px; color: red; font-family: var(--font-code); font-size: 0.8rem; z-index: 100; animation: blink 1s infinite;">
+                                            ● REC
+                                        </div>
+
+                                        <model-viewer 
+                                            src="models/mq9mdd1.glb"
+                                            alt="MQ-9 Reaper"
+                                            auto-rotate
+                                            auto-rotate-delay="1000"
+                                            rotation-per-second="15deg"
+                                            camera-controls
+                                            camera-target="auto auto auto"
+                                            camera-orbit="30deg 75deg 0.6m"
+                                            min-camera-orbit="auto auto 0.5m"
+                                            max-camera-orbit="auto auto 8m"
+                                            interpolation-decay="300"
+                                            environment-image="neutral"
+                                            shadow-intensity="1"
+                                            exposure="1"
+                                            style="width: 100%; height: 100%;">
+                                        </model-viewer>
+
+                                        <div style="position: absolute; bottom: 15px; left: 15px; font-family: var(--font-code); font-size: 0.65rem; color: var(--text-muted); background: rgba(0,0,0,0.9); padding: 12px; border: 1px solid #333; z-index: 100;">
+                                            <div style="color: var(--accent); margin-bottom: 8px; font-weight: bold;">▶ CONTROLLI:</div>
+                                            <div style="line-height: 1.8;">
+                                                🖱️ CLICK + TRASCINA: Ruota<br>
+                                                🔍 SCROLL: Zoom<br>
+                                                🖱️ DESTRO + TRASCINA: Pan
+                                            </div>
+                                        </div>
+
+                                        <div style="position: absolute; bottom: 15px; right: 15px; font-family: var(--font-code); font-size: 0.65rem; background: rgba(0,0,0,0.9); padding: 12px; border: 1px solid #333; z-index: 100; text-align: right;">
+                                            <span style="color: #00ff88;">● ONLINE</span><br>
+                                            <span style="color: white;">MQ-9 REAPER</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: 25px; padding: 25px; background: rgba(255,157,0,0.03); border-left: 3px solid var(--accent);">
+                                        <h4 style="color: var(--accent); margin-bottom: 15px;">📋 SPECIFICHE MQ-9 REAPER</h4>
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; color: var(--text-muted);">
+                                            <div>
+                                                <strong style="color: white;">Produttore:</strong> General Atomics<br>
+                                                <strong style="color: white;">Lunghezza:</strong> 11 m<br>
+                                                <strong style="color: white;">Apertura alare:</strong> 20 m
+                                            </div>
+                                            <div>
+                                                <strong style="color: white;">Velocità max:</strong> 480 km/h<br>
+                                                <strong style="color: white;">Quota:</strong> 15,000 m<br>
+                                                <strong style="color: white;">Autonomia:</strong> 27+ ore
+                                            </div>
+                                            <div>
+                                                <strong style="color: white;">Peso max:</strong> 4,760 kg<br>
+                                                <strong style="color: white;">Motore:</strong> 900 HP<br>
+                                                <strong style="color: white;">Costo:</strong> ~32M $
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>   
+                </div>
+            </div>       
+        </div>          
+
+    <!-- STORIA (Capitolo 4) -->
+    <section id="evolution">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-subtitle">CAPITOLO 04</div>
+                <h2 class="section-title">EVOLUZIONE & FUTURO</h2>
+            </div>
+
+            <div class="timeline">
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-date">1914 - 1945</div>
+                    <div class="tl-content">
+                        <h4>PRIME SPERIMENTAZIONI</h4>
+                        <p>Bombe radiocomandate e veicoli esplosivi teleguidati durante le Guerre Mondiali.</p>
+                    </div>
+                </div>
+
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-date">GUERRA FREDDA</div>
+                    <div class="tl-content">
+                        <h4>RICOGNIZIONE REMOTA</h4>
+                        <p>Sviluppo di droni da ricognizione pilotati a distanza.</p>
+                    </div>
+                </div>
+
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-date">ANNI 2000</div>
+                    <div class="tl-content">
+                        <h4>L'ERA DEI DRONI</h4>
+                        <p>Droni aerei e robot EOD entrano stabilmente nelle operazioni. Ogni generazione porta sensori più affidabili.</p>
+                    </div>
+                </div>
+
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-date">OGGI & DOMANI</div>
+                    <div class="tl-content">
+                        <h4>AI & SWARM ROBOTICS</h4>
+                        <p>
+                            <strong>Automazione e AI:</strong> Algoritmi capaci di riconoscere veicoli e persone, stimare traiettorie e scegliere manovre.<br>
+                            <strong>Swarm Robotics:</strong> Sciami di micro-droni che cooperano (come api) per saturare le difese.<br>
+                            <strong>Difesa e Cyber:</strong> Necessità di sistemi Anti-Drone e protezione da hacking/jamming.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-date">SCENARI FUTURI</div>
+                    <div class="tl-content">
+                        <h4>PROSPETTIVE</h4>
+                        <p>
+                            Robot a basso costo diffusi in tutti i reparti per ricognizione e logistica. Sistemi semi-autonomi con controllo umano sulle decisioni delicate. Definizione di standard internazionali e possibili trattati sui sistemi d'arma autonomi. Collaborazione crescente tra industria civile high-tech e settore della difesa.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ANALISI (Capitolo 5) -->
+    <section id="analysis">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-subtitle">CAPITOLO 05</div>
+                <h2 class="section-title">PRO & CONTRO</h2>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comp-col pro">
+                    <h4 style="color: #00ff88;">VANTAGGI OPERATIVI</h4>
+                    <ul style="list-style: none; padding: 0; margin-top: 20px;">
+                        <li style="margin-bottom: 15px;">+ <strong>Sicurezza:</strong> Riduzione rischi per il personale (sminamento, NBCR).</li>
+                        <li style="margin-bottom: 15px;">+ <strong>Efficienza:</strong> I robot non si stancano, operano 24/7 con precisione.</li>
+                        <li style="margin-bottom: 15px;">+ <strong>Nuove Capacità:</strong> Esplorazione ambienti estremi e sorveglianza prolungata.</li>
+                    </ul>
+                </div>
+                <div class="comp-col con">
+                    <h4 style="color: #ff3333;">SVANTAGGI E RISCHI</h4>
+                    <ul style="list-style: none; padding: 0; margin-top: 20px;">
+                        <li style="margin-bottom: 15px;">- <strong>Tecnici:</strong> Vulnerabilità a guasti hardware (vibrazioni, urti, condizioni estreme), errori software e malfunzionamenti dei sensori.</li>
+                        <li style="margin-bottom: 15px;">- <strong>Cyber-sicurezza:</strong> Rischio di jamming, spoofing, attacchi informatici al software di bordo e accecamento sensori.</li>
+                        <li style="margin-bottom: 15px;">- <strong>Economici:</strong> Costi elevati di sviluppo e manutenzione; possibile perdita posti lavoro in logistica.</li>
+                        <li style="margin-bottom: 15px;">- <strong>Psicologici:</strong> Distanza dalla violenza, banalizzazione della guerra, riduzione percezione del rischio.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dossier-card" style="margin-top: 30px; border-color: #ff3333;">
+                <h3 style="color: #ff3333;">QUESTIONI ETICHE: L.A.W.S.</h3>
+                <p style="margin-top: 15px;">
+                    L'uso di <strong>Sistemi d'Arma Autonomi Letali</strong> solleva questioni morali profonde. 
+                    Il Diritto Internazionale Umanitario richiede distinzione e proporzionalità, concetti difficili da codificare in un algoritmo. 
+                    Chi è responsabile se un robot sbaglia? Come verificare che le decisioni autonome siano conformi alle leggi di guerra?
+                </p>
+                <p style="margin-top: 15px;">
+                    <strong>Corsa agli armamenti:</strong> C'è il rischio di una nuova corsa agli armamenti. Sistemi come piccoli droni armati possono essere acquistati o modificati anche da attori non statali, favorendo una proliferazione incontrollata.
+                </p>
+            </div>
+
+            <div class="dossier-card" style="margin-top: 20px; border-color: var(--accent);">
+                <h3 style="color: var(--accent);">SINTESI CRITICA</h3>
+                <p style="margin-top: 15px;">
+                    La robotica militare può ridurre i rischi per i soldati e migliorare la precisione degli interventi. 
+                    Allo stesso tempo può facilitare l'uso della forza, aumentare la complessità dei conflitti e creare nuove disuguaglianze tra Paesi. 
+                    <strong>Il punto decisivo è garantire un controllo umano significativo sui sistemi d'arma e sviluppare regole internazionali condivise.</strong>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCLUSIONI (Capitolo 6) -->
+    <section id="conclusions">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-subtitle">CAPITOLO 06</div>
+                <h2 class="section-title">CONCLUSIONI</h2>
+            </div>
+
+            <div class="dossier-card">
+                <p>La robotica militare rappresenta uno dei fronti più avanzati e controversi dell'automazione contemporanea. Dall'analisi svolta emergono alcuni elementi fondamentali:</p>
+                <ul>
+                    <li>I robot offrono nuove possibilità operative, in particolare nella protezione del personale e nella raccolta di informazioni.</li>
+                    <li>La convergenza tra Industria 4.0 e Difesa sta trasformando sia il modo di produrre armamenti sia il modo di condurre le operazioni.</li>
+                    <li>La crescente autonomia dei sistemi solleva interrogativi profondi su responsabilità, etica e controllo politico dell'uso della forza.</li>
+                    <li>Le scelte che governi e società civile compiranno determineranno se la robotica sarà usata per aumentare la sicurezza o contribuirà a nuovi rischi.</li>
+                </ul>
+                <p style="margin-top: 20px; border-left: 3px solid var(--accent); padding-left: 15px;">
+                    <strong>Considerazione finale:</strong> Il futuro della robotica militare dipenderà dalla capacità di bilanciare innovazione tecnologica e responsabilità etica, garantendo sempre un controllo umano significativo sulle decisioni critiche.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- GLOSSARIO -->
+    <section id="glossary">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-subtitle">APPENDICE</div>
+                <h2 class="section-title">GLOSSARIO</h2>
+            </div>
+
+            <div class="dossier-card">
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] APRI GLOSSARIO TERMINI</button>
+                <div class="dossier-body">
+                    <ul>
+                        <li><strong>Robot:</strong> Macchina programmabile in grado di percepire l'ambiente, elaborare informazioni ed eseguire azioni fisiche autonome o semi-autonome.</li>
+                        <li><strong>UGV:</strong> Unmanned Ground Vehicle, veicolo terrestre senza equipaggio.</li>
+                        <li><strong>UAV:</strong> Unmanned Aerial Vehicle, drone aereo.</li>
+                        <li><strong>USV:</strong> Unmanned Surface Vehicle, veicolo di superficie senza equipaggio.</li>
+                        <li><strong>UUV:</strong> Unmanned Underwater Vehicle, veicolo subacqueo senza equipaggio.</li>
+                        <li><strong>LAWS:</strong> Lethal Autonomous Weapon Systems, sistemi d'arma autonomi letali.</li>
+                        <li><strong>Industria 4.0:</strong> Insieme di tecnologie (IoT, big data, IA, robotica, stampa 3D) che digitalizzano i processi produttivi.</li>
+                        <li><strong>Difesa 4.0:</strong> Applicazione dei principi dell'Industria 4.0 al settore militare.</li>
+                        <li><strong>Swarm robotics:</strong> Robotica degli sciami, cooperazione di molti robot semplici.</li>
+                        <li><strong>GPS:</strong> Global Positioning System, sistema di posizionamento satellitare.</li>
+                        <li><strong>IMU:</strong> Inertial Measurement Unit, misura accelerazioni e rotazioni per stimare spostamenti.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUESTIONARIO -->
+    <section id="quiz">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-subtitle">VERIFICA</div>
+                <h2 class="section-title">QUESTIONARIO</h2>
+            </div>
+
+            <div class="dossier-card">
+                <h3 style="color: var(--accent); margin-bottom: 20px;">PARTE A: VERIFICA CONOSCENZE</h3>
+                <p style="margin-bottom: 30px; color: var(--text-muted);">Rispondi alle seguenti domande selezionando la risposta corretta.</p>
+                
+                <!-- Domanda 1 - Tecnologie -->
+                <div class="quiz-question" id="q1">
+                    <h4 style="color: white; margin-bottom: 15px;">1. Quali sono i tre elementi fondamentali dell'architettura di un robot?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(1, 'a', false)">A) Motore, batteria, antenna</button>
+                        <button class="quiz-btn" onclick="checkAnswer(1, 'b', true)">B) Sensori, controllo, attuatori</button>
+                        <button class="quiz-btn" onclick="checkAnswer(1, 'c', false)">C) GPS, radar, telecamera</button>
+                        <button class="quiz-btn" onclick="checkAnswer(1, 'd', false)">D) Software, hardware, firmware</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback1"></div>
+                </div>
+
+                <!-- Domanda 2 - Sensori -->
+                <div class="quiz-question" id="q2" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">2. Quale sensore utilizza impulsi laser per costruire mappe 3D dell'ambiente?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(2, 'a', false)">A) Radar</button>
+                        <button class="quiz-btn" onclick="checkAnswer(2, 'b', false)">B) Sensore termico (IR)</button>
+                        <button class="quiz-btn" onclick="checkAnswer(2, 'c', true)">C) Lidar</button>
+                        <button class="quiz-btn" onclick="checkAnswer(2, 'd', false)">D) GPS</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback2"></div>
+                </div>
+
+                <!-- Domanda 3 - Autonomia -->
+                <div class="quiz-question" id="q3" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">3. In quale livello di autonomia l'operatore assegna missioni di alto livello e il robot pianifica i dettagli?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(3, 'a', false)">A) Teleoperazione</button>
+                        <button class="quiz-btn" onclick="checkAnswer(3, 'b', false)">B) Autonomia assistita</button>
+                        <button class="quiz-btn" onclick="checkAnswer(3, 'c', true)">C) Autonomia supervisata</button>
+                        <button class="quiz-btn" onclick="checkAnswer(3, 'd', false)">D) Autonomia piena</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback3"></div>
+                </div>
+
+                <!-- Domanda 4 - Applicazioni UGV -->
+                <div class="quiz-question" id="q4" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">4. Per quale operazione vengono principalmente utilizzati gli UGV con bracci manipolatori?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(4, 'a', true)">A) Neutralizzazione di ordigni esplosivi (EOD)</button>
+                        <button class="quiz-btn" onclick="checkAnswer(4, 'b', false)">B) Trasporto truppe</button>
+                        <button class="quiz-btn" onclick="checkAnswer(4, 'c', false)">C) Ricognizione aerea</button>
+                        <button class="quiz-btn" onclick="checkAnswer(4, 'd', false)">D) Comunicazioni satellitari</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback4"></div>
+                </div>
+
+                <!-- Domanda 5 - UAV -->
+                <div class="quiz-question" id="q5" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">5. Cosa sono le "munizioni circuitanti" (loitering munitions)?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(5, 'a', false)">A) Missili a lungo raggio</button>
+                        <button class="quiz-btn" onclick="checkAnswer(5, 'b', true)">B) Droni che sorvolano un'area in attesa e poi colpiscono il bersaglio</button>
+                        <button class="quiz-btn" onclick="checkAnswer(5, 'c', false)">C) Proiettili guidati da laser</button>
+                        <button class="quiz-btn" onclick="checkAnswer(5, 'd', false)">D) Bombe a caduta libera</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback5"></div>
+                </div>
+
+                <!-- Domanda 6 - Storia -->
+                <div class="quiz-question" id="q6" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">6. In quale periodo i droni aerei e i robot EOD sono entrati stabilmente nelle operazioni militari?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(6, 'a', false)">A) Prima Guerra Mondiale</button>
+                        <button class="quiz-btn" onclick="checkAnswer(6, 'b', false)">B) Guerra Fredda</button>
+                        <button class="quiz-btn" onclick="checkAnswer(6, 'c', true)">C) Anni 2000</button>
+                        <button class="quiz-btn" onclick="checkAnswer(6, 'd', false)">D) Anni '60</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback6"></div>
+                </div>
+
+                <!-- Domanda 7 - Industria 4.0 -->
+                <div class="quiz-question" id="q7" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">7. Cosa permette la "manutenzione predittiva" nella Difesa 4.0?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(7, 'a', false)">A) Riparare i robot dopo che si guastano</button>
+                        <button class="quiz-btn" onclick="checkAnswer(7, 'b', true)">B) Prevenire i guasti analizzando i dati dei sensori</button>
+                        <button class="quiz-btn" onclick="checkAnswer(7, 'c', false)">C) Sostituire i robot ogni anno</button>
+                        <button class="quiz-btn" onclick="checkAnswer(7, 'd', false)">D) Produrre robot più economici</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback7"></div>
+                </div>
+
+                <!-- Domanda 8 - Vantaggi -->
+                <div class="quiz-question" id="q8" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">8. Qual è uno dei principali vantaggi operativi della robotica militare?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(8, 'a', false)">A) Costi di produzione bassi</button>
+                        <button class="quiz-btn" onclick="checkAnswer(8, 'b', false)">B) Semplicità di programmazione</button>
+                        <button class="quiz-btn" onclick="checkAnswer(8, 'c', true)">C) Riduzione dei rischi per il personale umano</button>
+                        <button class="quiz-btn" onclick="checkAnswer(8, 'd', false)">D) Nessuna necessità di manutenzione</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback8"></div>
+                </div>
+
+                <!-- Domanda 9 - Svantaggi -->
+                <div class="quiz-question" id="q9" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">9. Cos'è il "jamming" nel contesto della cyber-sicurezza robotica?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(9, 'a', true)">A) Disturbo intenzionale dei segnali radio</button>
+                        <button class="quiz-btn" onclick="checkAnswer(9, 'b', false)">B) Furto di dati sensibili</button>
+                        <button class="quiz-btn" onclick="checkAnswer(9, 'c', false)">C) Virus informatico</button>
+                        <button class="quiz-btn" onclick="checkAnswer(9, 'd', false)">D) Malfunzionamento dei motori</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback9"></div>
+                </div>
+
+                <!-- Domanda 10 - Etica -->
+                <div class="quiz-question" id="q10" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">10. Cosa significa l'acronimo L.A.W.S.?</h4>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(10, 'a', false)">A) Light Armored Weapon Systems</button>
+                        <button class="quiz-btn" onclick="checkAnswer(10, 'b', false)">B) Long-range Aerial Warfare Systems</button>
+                        <button class="quiz-btn" onclick="checkAnswer(10, 'c', true)">C) Lethal Autonomous Weapon Systems</button>
+                        <button class="quiz-btn" onclick="checkAnswer(10, 'd', false)">D) Laser-Assisted Warning Systems</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback10"></div>
+                </div>
+
+                <!-- Risultato finale -->
+                <div id="quiz-result" style="margin-top: 40px; padding: 20px; background: rgba(255,157,0,0.1); border: 1px solid var(--accent); display: none;">
+                    <h4 style="color: var(--accent);">RISULTATO</h4>
+                    <p id="score-text" style="font-size: 1.2rem; margin-top: 10px;"></p>
+                </div>
+
+                <button class="expand-btn" style="margin-top: 30px;" onclick="showResults()">VERIFICA RISPOSTE</button>
+            </div>
+
+            <!-- SEZIONE OPINIONI -->
+            <div class="dossier-card" style="margin-top: 40px; border-color: var(--accent);">
+                <h3 style="color: var(--accent); margin-bottom: 20px;">PARTE B: LA TUA OPINIONE</h3>
+                <p style="margin-bottom: 30px; color: var(--text-muted);">In questa sezione non ci sono risposte giuste o sbagliate. Seleziona l'opzione che meglio riflette la tua opinione personale.</p>
+
+                <!-- Opinione 1 -->
+                <div class="opinion-question" id="op1">
+                    <h4 style="color: white; margin-bottom: 15px;">1. Pensi che i robot militari dovrebbero avere la capacità di prendere decisioni letali in modo autonomo?</h4>
+                    <div class="opinion-options">
+                        <button class="opinion-btn" onclick="selectOpinion(1, this)">Sì, aumenterebbe l'efficienza e ridurrebbe gli errori umani</button>
+                        <button class="opinion-btn" onclick="selectOpinion(1, this)">Solo in situazioni di emergenza con supervisione umana</button>
+                        <button class="opinion-btn" onclick="selectOpinion(1, this)">No, le decisioni letali devono sempre essere umane</button>
+                        <button class="opinion-btn" onclick="selectOpinion(1, this)">Non ho un'opinione definita</button>
+                    </div>
+                </div>
+
+                <!-- Opinione 2 -->
+                <div class="opinion-question" id="op2" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">2. Quale aspetto della robotica militare ti preoccupa di più?</h4>
+                    <div class="opinion-options">
+                        <button class="opinion-btn" onclick="selectOpinion(2, this)">La possibilità di errori letali causati da malfunzionamenti</button>
+                        <button class="opinion-btn" onclick="selectOpinion(2, this)">La proliferazione verso attori non statali (terrorismo)</button>
+                        <button class="opinion-btn" onclick="selectOpinion(2, this)">La perdita di posti di lavoro nel settore militare</button>
+                        <button class="opinion-btn" onclick="selectOpinion(2, this)">La "banalizzazione" della guerra e distanza dalla violenza</button>
+                        <button class="opinion-btn" onclick="selectOpinion(2, this)">Nessuna di queste mi preoccupa particolarmente</button>
+                    </div>
+                </div>
+
+                <!-- Opinione 3 -->
+                <div class="opinion-question" id="op3" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">3. Come dovrebbe essere regolamentata la robotica militare a livello internazionale?</h4>
+                    <div class="opinion-options">
+                        <button class="opinion-btn" onclick="selectOpinion(3, this)">Divieto totale dei sistemi d'arma autonomi</button>
+                        <button class="opinion-btn" onclick="selectOpinion(3, this)">Regolamentazione stretta con controllo umano obbligatorio</button>
+                        <button class="opinion-btn" onclick="selectOpinion(3, this)">Linee guida volontarie, senza divieti</button>
+                        <button class="opinion-btn" onclick="selectOpinion(3, this)">Ogni Paese dovrebbe decidere autonomamente</button>
+                    </div>
+                </div>
+
+                <!-- Opinione 4 -->
+                <div class="opinion-question" id="op4" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">4. Ritieni che la robotica militare abbia più vantaggi o svantaggi per la società?</h4>
+                    <div class="opinion-options">
+                        <button class="opinion-btn" onclick="selectOpinion(4, this)">Decisamente più vantaggi (protezione soldati, precisione)</button>
+                        <button class="opinion-btn" onclick="selectOpinion(4, this)">Leggermente più vantaggi che svantaggi</button>
+                        <button class="opinion-btn" onclick="selectOpinion(4, this)">Vantaggi e svantaggi si equivalgono</button>
+                        <button class="opinion-btn" onclick="selectOpinion(4, this)">Leggermente più svantaggi che vantaggi</button>
+                        <button class="opinion-btn" onclick="selectOpinion(4, this)">Decisamente più svantaggi (rischi etici, proliferazione)</button>
+                    </div>
+                </div>
+
+                <!-- Opinione 5 -->
+                <div class="opinion-question" id="op5" style="margin-top: 30px;">
+                    <h4 style="color: white; margin-bottom: 15px;">5. Se fossi un decisore politico, quale sarebbe la tua priorità riguardo alla robotica militare?</h4>
+                    <div class="opinion-options">
+                        <button class="opinion-btn" onclick="selectOpinion(5, this)">Investire nello sviluppo per mantenere un vantaggio tecnologico</button>
+                        <button class="opinion-btn" onclick="selectOpinion(5, this)">Focalizzarsi su applicazioni difensive e di protezione</button>
+                        <button class="opinion-btn" onclick="selectOpinion(5, this)">Promuovere accordi internazionali per limitare l'uso</button>
+                        <button class="opinion-btn" onclick="selectOpinion(5, this)">Sviluppare tecnologie civili derivate (ricerca, soccorso)</button>
+                    </div>
+                </div>
+
+                <!-- Riepilogo opinioni -->
+                <div id="opinion-summary" style="margin-top: 40px; padding: 20px; background: rgba(255,157,0,0.05); border: 1px solid #333; display: none;">
+                    <h4 style="color: var(--accent);">LE TUE RISPOSTE</h4>
+                    <div id="opinion-list" style="margin-top: 15px;"></div>
+                </div>
+
+                <button class="expand-btn" style="margin-top: 30px;" onclick="showOpinionSummary()">VISUALIZZA RIEPILOGO OPINIONI</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER (Team) -->
+    <footer id="footer">
+        <div class="container">
+            <div class="section-subtitle">UNITÀ DI RICERCA</div>
+            <h2 style="color: white;">GRUPPO DI LAVORO</h2>
+            
+            <div class="team-grid">
+                <div class="team-card">
+                    <span class="team-role">RICERCA & SVILUPPO</span>
+                    <div class="team-name">FEDERICO NARDULLO</div>
+                </div>
+                <div class="team-card">
+                    <span class="team-role">RICERCA & SVILUPPO</span>
+                    <div class="team-name">LUCA CREMASCHI</div>
+                </div>
+                <div class="team-card">
+                    <span class="team-role">RICERCA & SVILUPPO</span>
+                    <div class="team-name">NICCOLÒ DECANO</div>
+                </div>
+                <div class="team-card">
+                    <span class="team-role">RICERCA & SVILUPPO</span>
+                    <div class="team-name">DIEGO RIPAMONTI</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #222; font-size: 0.8rem; color: #666; display: flex; justify-content: space-between;">
+                <div>FONTI: Croce Rossa Int., ONU (GGE on LAWS), SIPRI Yearbook, P.W. Singer.</div>
+                <div>© 2025 PROGETTO SCOLASTICO</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- QUIZ FUNCTIONALITY ---
+        let answers = {};
+        let correctCount = 0;
+        let opinions = {};
+
+        function checkAnswer(questionNum, answer, isCorrect) {
+            if (answers[questionNum]) return; // Already answered
+            
+            answers[questionNum] = { answer: answer, correct: isCorrect };
+            
+            const buttons = document.querySelectorAll(`#q${questionNum} .quiz-btn`);
+            buttons.forEach(btn => {
+                btn.classList.add('disabled');
+                if (btn.textContent.startsWith(answer.toUpperCase())) {
+                    btn.classList.add(isCorrect ? 'correct' : 'wrong');
+                }
+            });
+            
+            // Show correct answer if wrong
+            if (!isCorrect) {
+                buttons.forEach(btn => {
+                    if (btn.onclick.toString().includes('true')) {
+                        btn.classList.add('correct');
+                    }
+                });
+            } else {
+                correctCount++;
+            }
+
+            const feedback = document.getElementById(`feedback${questionNum}`);
+            feedback.classList.add('show');
+            feedback.style.color = isCorrect ? '#00ff88' : '#ff3333';
+            feedback.innerHTML = isCorrect ? '✓ Risposta corretta!' : '✗ Risposta errata';
+        }
+
+        function showResults() {
+            const totalQuestions = 10;
+            const answeredQuestions = Object.keys(answers).length;
+            
+            if (answeredQuestions < totalQuestions) {
+                alert('Rispondi a tutte le ' + totalQuestions + ' domande prima di verificare i risultati.');
+                return;
+            }
+
+            const resultDiv = document.getElementById('quiz-result');
+            const scoreText = document.getElementById('score-text');
+            
+            resultDiv.style.display = 'block';
+            
+            const percentage = Math.round((correctCount / totalQuestions) * 100);
+            let message = '';
+            
+            if (percentage >= 90) {
+                message = `Eccellente! ${correctCount}/${totalQuestions} risposte corrette (${percentage}%)`;
+                resultDiv.style.borderColor = '#00ff88';
+            } else if (percentage >= 70) {
+                message = `Ottimo risultato: ${correctCount}/${totalQuestions} risposte corrette (${percentage}%)`;
+                resultDiv.style.borderColor = '#00ff88';
+            } else if (percentage >= 60) {
+                message = `Buon risultato: ${correctCount}/${totalQuestions} risposte corrette (${percentage}%)`;
+                resultDiv.style.borderColor = 'var(--accent)';
+            } else {
+                message = `Da rivedere: ${correctCount}/${totalQuestions} risposte corrette (${percentage}%)`;
+                resultDiv.style.borderColor = '#ff3333';
+            }
+            
+            scoreText.innerHTML = message;
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- OPINION FUNCTIONALITY ---
+        function selectOpinion(questionNum, btn) {
+            // Deselect all buttons in this question
+            const buttons = document.querySelectorAll(`#op${questionNum} .opinion-btn`);
+            buttons.forEach(b => b.classList.remove('selected'));
+            
+            // Select clicked button
+            btn.classList.add('selected');
+            
+            // Store opinion
+            opinions[questionNum] = btn.textContent;
+        }
+
+        function showOpinionSummary() {
+            const totalOpinions = 5;
+            const answeredOpinions = Object.keys(opinions).length;
+            
+            if (answeredOpinions < totalOpinions) {
+                alert('Seleziona una risposta per tutte le ' + totalOpinions + ' domande di opinione.');
+                return;
+            }
+
+            const summaryDiv = document.getElementById('opinion-summary');
+            const listDiv = document.getElementById('opinion-list');
+            
+            let html = '';
+            for (let i = 1; i <= totalOpinions; i++) {
+                html += `<p style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.03);">
+                    <strong style="color: var(--accent);">Domanda ${i}:</strong><br>
+                    <span style="color: var(--text-muted);">${opinions[i]}</span>
+                </p>`;
+            }
+            
+            listDiv.innerHTML = html;
+            summaryDiv.style.display = 'block';
+            summaryDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- EXPAND CONTENT ---
+        function toggleDossier(btn) {
+            const body = btn.parentElement.querySelector('.dossier-body');
+            if (body.classList.contains('open')) {
+                body.classList.remove('open');
+                btn.innerText = btn.innerText.replace('[-]', '[+]').replace('CHIUDI', 'APRI');
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--accent)';
+            } else {
+                body.classList.add('open');
+                btn.innerText = btn.innerText.replace('[+]', '[-]').replace('APRI', 'CHIUDI');
+                btn.style.background = 'var(--accent)';
+                btn.style.color = 'black';
+            }
+        }
+
+        // --- ACTIVE LINK ON SCROLL (Fixed for Footer) ---
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            // Standard scroll spy
+            document.querySelectorAll('section, header, footer').forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 300) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            // Force footer detection if at bottom of page
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+                current = 'footer';
+            }
+
+            document.querySelectorAll('.nav-item').forEach(li => {
+                li.classList.remove('active');
+                if (li.getAttribute('href').includes(current)) {
+                    li.classList.add('active');
+                }
+            });
+        });
+
+        // --- DYNAMIC BACKGROUND (MOUSE REACTIVE) ---
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, particles = [];
+        let mouse = { x: null, y: null };
+
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        
+        function init() {
+            resize(); particles = [];
+            const particleCount = window.innerWidth < 768 ? 30 : 60;
+            for(let i=0; i<particleCount; i++) {
+                particles.push({
+                    x: Math.random() * w, y: Math.random() * h,
+                    vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, w, h);
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x < 0 || p.x > w) p.vx *= -1;
+                if(p.y < 0 || p.y > h) p.vy *= -1;
+
+                let dx = mouse.x - p.x; let dy = mouse.y - p.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < 150) { p.x -= dx/25; p.y -= dy/25; }
+
+                ctx.fillStyle = '#ff9d00'; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+
+                for(let j=i; j<particles.length; j++) {
+                    let dx2 = p.x - particles[j].x; let dy2 = p.y - particles[j].y;
+                    let dist = Math.sqrt(dx2*dx2 + dy2*dy2);
+                    if(dist < 100) {
+                        ctx.beginPath(); ctx.strokeStyle = `rgba(255, 157, 0, ${0.2 - dist/500})`;
+                        ctx.lineWidth = 0.5; ctx.moveTo(p.x, p.y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        init(); animate();
+    </script>
+</body>
+</html>
