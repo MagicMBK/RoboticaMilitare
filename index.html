@@ -645,8 +645,103 @@
                         </section>
                     </div>   
                 </div>
-            </div>       
+            </div>
+            
+            <div class="dossier-card">
+                <div class="tactical-img">
+                    <img src="https://www.navalnews.com/wp-content/uploads/2022/09/Orca-XLUUV-scaled.jpg" alt="UUV">
+                    <div class="img-overlay">CAM_03 // SUBSEA // DEPTH: -300M</div>
+                </div>
+                <h3>DRONI SOTTOMARINI (UUV)</h3>
+                <button class="expand-btn" onclick="toggleDossier(this)">[+] ANALISI UUV</button>
+                <div class="dossier-body">
+                    <ul>
+                        <li><strong>Ricognizione Subacquea:</strong> UUV autonomi per mappatura fondali, rilevamento mine e sorveglianza di infrastrutture critiche sottomarine.</li>
+                        <li><strong>Guerra Anti-Sottomarina (ASW):</strong> Droni sottomarini equipaggiati con sonar per tracciamento e classificazione di sottomarini nemici.</li>
+                        <li><strong>Posa Mine e Controminamento:</strong> Veicoli autonomi per dispiegamento strategico di mine o neutralizzazione di ordigni nemici.</li>
+                        <li><strong>Attacco Furtivo:</strong> XLUUV (Extra Large UUV) armati con siluri, capaci di operazioni offensive a lungo raggio senza equipaggio.</li>
+                        <li><strong>Ispezione Infrastrutture:</strong> Monitoraggio di cavi sottomarini, oleodotti e piattaforme offshore per sicurezza nazionale.</li>
+                    </ul>
+                    <div>
+                        <section id="model-3d-uuv" style="margin-right: 80px;">
+                            <div class="container">
+                                <div class="section-header">
+                                    <div class="section-subtitle">CAPITOLO 03.5 // VISUALIZZAZIONE 3D</div>
+                                    <h2 class="section-title">BOEING ORCA XLUUV</h2>
+                                </div>
+
+                                <div class="dossier-card">
+                                    <div style="position: relative; width: 100%; height: 600px; background: #000; border: 1px solid #333; overflow: hidden;">
+                                        
+                                        <div style="position: absolute; top: 10px; left: 10px; font-family: var(--font-code); font-size: 0.7rem; color: var(--accent); background: rgba(0,0,0,0.8); padding: 5px 10px; z-index: 100; border: 1px solid rgba(255,157,0,0.3);">
+                                            3D TACTICAL VIEW // BOEING ORCA XLUUV
+                                        </div>
+                                        
+                                        <div style="position: absolute; top: 10px; right: 10px; color: red; font-family: var(--font-code); font-size: 0.8rem; z-index: 100; animation: blink 1s infinite;">
+                                            ● REC
+                                        </div>
+
+                                        <model-viewer 
+                                            src="3dModels/XLUUV_orca.glb"
+                                            alt="Boeing Orca XLUUV"
+                                            auto-rotate
+                                            auto-rotate-delay="1000"
+                                            rotation-per-second="15deg"
+                                            camera-controls
+                                            camera-target="auto auto auto"
+                                            camera-orbit="30deg 75deg 20m"
+                                            min-camera-orbit="auto auto 0.5m"
+                                            max-camera-orbit="auto auto 50m"
+                                            interpolation-decay="300"
+                                            environment-image="neutral"
+                                            shadow-intensity="1"
+                                            exposure="1"
+                                            style="width: 100%; height: 100%;">
+                                        </model-viewer>
+
+                                        <div style="position: absolute; bottom: 15px; left: 15px; font-family: var(--font-code); font-size: 0.65rem; color: var(--text-muted); background: rgba(0,0,0,0.9); padding: 12px; border: 1px solid #333; z-index: 100;">
+                                            <div style="color: var(--accent); margin-bottom: 8px; font-weight: bold;">▶ CONTROLLI:</div>
+                                            <div style="line-height: 1.8;">
+                                                🖱️ CLICK + TRASCINA: Ruota<br>
+                                                🔍 SCROLL: Zoom<br>
+                                                🖱️ DESTRO + TRASCINA: Pan
+                                            </div>
+                                        </div>
+
+                                        <div style="position: absolute; bottom: 15px; right: 15px; font-family: var(--font-code); font-size: 0.65rem; background: rgba(0,0,0,0.9); padding: 12px; border: 1px solid #333; z-index: 100; text-align: right;">
+                                            <span style="color: #00ff88;">● ONLINE</span><br>
+                                            <span style="color: white;">ORCA XLUUV</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: 25px; padding: 25px; background: rgba(255,157,0,0.03); border-left: 3px solid var(--accent);">
+                                        <h4 style="color: var(--accent); margin-bottom: 15px;">📋 SPECIFICHE BOEING ORCA XLUUV</h4>
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; color: var(--text-muted);">
+                                            <div>
+                                                <strong style="color: white;">Produttore:</strong> Boeing<br>
+                                                <strong style="color: white;">Lunghezza:</strong> 25.9 m<br>
+                                                <strong style="color: white;">Diametro:</strong> 2.6 m
+                                            </div>
+                                            <div>
+                                                <strong style="color: white;">Profondità max:</strong> 3,350 m<br>
+                                                <strong style="color: white;">Autonomia:</strong> Mesi<br>
+                                                <strong style="color: white;">Raggio:</strong> 6,500+ nm
+                                            </div>
+                                            <div>
+                                                <strong style="color: white;">Carico utile:</strong> 8+ tonnellate<br>
+                                                <strong style="color: white;">Propulsione:</strong> Diesel-elettrica<br>
+                                                <strong style="color: white;">Costo:</strong> ~30M $
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>   
+                </div>
+            </div>
         </div>          
+    </section>
 
     <!-- STORIA (Capitolo 4) -->
     <section id="evolution">
@@ -1309,3 +1404,4 @@
     ..-%%%%%%%%%%=............:=*%#+-......:-+#%%%%-.
     ...+%%%%%%%%%%#=:......=*%%%%%%%%###%%%%%%%%%#-..
     ....:=*#%%%%%%%%%%#+=-.....:-=++**#######*+=:.... -->
+
